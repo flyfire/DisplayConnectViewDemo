@@ -123,6 +123,7 @@ public class DisplayConnectView extends View {
                 mCacheBitmap.recycle();
                 mCacheBitmap = null;
             }
+            invalidate();
         }
     }
 }
