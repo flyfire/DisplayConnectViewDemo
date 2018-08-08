@@ -1,12 +1,14 @@
 package com.solarexsoft.displayconnectviewdemo;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import com.solarexsoft.displayconncetview.DisplayConnectView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.dcv_1)
@@ -29,5 +31,10 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         dcv_1.setConnectType(DisplayConnectView.ConnectType.START);
         dcv_6.setConnectType(DisplayConnectView.ConnectType.END);
+    }
+
+    @OnClick({R.id.ll_main})
+    public void click(View view) {
+        DisplayConnectWithTextActivity.goDisplayConnectWithTextActivity(this);
     }
 }
