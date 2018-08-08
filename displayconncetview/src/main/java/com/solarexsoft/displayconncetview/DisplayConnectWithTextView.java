@@ -18,13 +18,13 @@ import android.view.View;
  * </pre>
  */
 public class DisplayConnectWithTextView extends View {
-    private String mText = "Solarex";
+    private String mText = "23:59";
     private boolean isFinished = false;
     private int mTextSize;
     private int mTextColor = Color.parseColor("#969EAE");
-    private int mLineColor = Color.parseColor("#ff0000");
-    private int mFinishCircleColor = Color.parseColor("#ffff00");
-    private int mUnFinishCircleColor = Color.parseColor("#00ff00");
+    private int mLineColor = Color.parseColor("#DAE0E5");
+    private int mFinishCircleColor = Color.parseColor("#C4C9D2");
+    private int mUnFinishCircleColor = Color.parseColor("#3385EE");
 
     private Paint mTextPaint;
     private Paint mLinePaint;
@@ -32,13 +32,15 @@ public class DisplayConnectWithTextView extends View {
     private Paint mTransparentPaint;
 
     private int mTextWidth;
-    private int mTextBaseLine;
+    private int mCircleBaseY;
+    private int mTextBaseY;
     private int mTransparentWidth;
     private int mCircleRadius;
     private int mCircleX;
-    private int mLineStartX;
-    private int mLineEndX;
     private int mHalfLineWidth;
+
+    private int mLineUpEndY;
+    private int mLineDownStartY;
 
     private int DEFAULT_WIDTH;
     private int DEFAULT_HEIGHT;
@@ -73,7 +75,7 @@ public class DisplayConnectWithTextView extends View {
         }
 
         if (TextUtils.isEmpty(mText)) {
-            mText = "Solarex";
+            mText = "23:59";
         }
         mTextSize = Utils.dp2px(context, 13);
 
@@ -81,26 +83,33 @@ public class DisplayConnectWithTextView extends View {
         mTextPaint.setTextSize(mTextSize);
         mTextPaint.setColor(mTextColor);
 
-        mTextBaseLine = Utils.dp2px(context, 63.5f);
+        mCircleBaseY = Utils.dp2px(context, 63.5f);
+
+        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+        float distance = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
+        mTextBaseY = (int) (mCircleBaseY + distance);
 
         mTransparentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTransparentPaint.setColor(context.getResources().getColor(android.R.color.black));
+        mTransparentPaint.setColor(context.getResources().getColor(android.R.color.transparent));
         mTransparentWidth = Utils.dp2px(context, 14.5f);
 
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLinePaint.setColor(mLineColor);
-        mLinePaint.setStyle(Paint.Style.FILL);
-        mLinePaint.setStrokeWidth(Utils.dp2px(context, 3f));
+        mLinePaint.setStyle(Paint.Style.STROKE);
+        mLinePaint.setStrokeWidth(Utils.dp2px(context, 1f));
 
         mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        mCirclePaint.setStrokeWidth(Utils.dp2px(context, 2f));
+        mCirclePaint.setStrokeWidth(Utils.dp2px(context, 3f));
         mCircleRadius = Utils.dp2px(context, 5f);
 
-        DEFAULT_WIDTH = Utils.dp2px(context, 50);
+        DEFAULT_WIDTH = Utils.dp2px(context, 100);
         DEFAULT_HEIGHT = Utils.dp2px(context, 100);
 
-        mHalfLineWidth = Utils.dp2px(context, 1);
+        mHalfLineWidth = Utils.dp2px(context, 0.3f);
+
+        mLineUpEndY = mCircleBaseY - mCircleRadius;
+        mLineDownStartY = mCircleBaseY + mCircleRadius;
 
         calculateText();
         calculateCirlceColor();
@@ -122,24 +131,21 @@ public class DisplayConnectWithTextView extends View {
         mHeight = h;
 
         mTransparentRect = new Rect(mTextWidth,0,mTextWidth+mTransparentWidth,mHeight);
-        mLineRect = new Rect(mLineStartX, 0, mLineEndX, mHeight);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawText(mText, 0, mTextBaseLine, mTextPaint);
-//        canvas.drawRect(mTransparentRect, mTransparentPaint);
-//        canvas.drawLine(mLineStartX,0,mLineEndX,mHeight, mLinePaint);
-        canvas.drawRect(mLineRect, mLinePaint);
-        canvas.drawCircle(mCircleX, mTextBaseLine, mCircleRadius, mCirclePaint);
+        canvas.drawText(mText, 0, mTextBaseY, mTextPaint);
+        canvas.drawRect(mTransparentRect, mTransparentPaint);
+        canvas.drawLine(mCircleX, 0,mCircleX, mLineUpEndY, mLinePaint);
+        canvas.drawLine(mCircleX, mLineDownStartY, mCircleX, mHeight, mLinePaint);
+        canvas.drawCircle(mCircleX, mCircleBaseY, mCircleRadius, mCirclePaint);
     }
 
     private void calculateText() {
         mTextWidth = (int) mTextPaint.measureText(mText);
         mCircleX = mTextWidth + mTransparentWidth + mCircleRadius;
-        mLineStartX =  mCircleX - mHalfLineWidth;
-        mLineEndX = mCircleX + mHalfLineWidth;
     }
 
     public void setFinished(boolean finished) {
